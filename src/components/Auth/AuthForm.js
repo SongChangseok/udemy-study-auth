@@ -2,6 +2,7 @@ import { useContext, useRef, useState } from "react";
 
 import classes from "./AuthForm.module.css";
 import AuthContext from "../../store/auth-context";
+import { useHistory } from "react-router-dom";
 
 const AuthForm = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -9,18 +10,20 @@ const AuthForm = () => {
   const emailInputRef = useRef();
   const passwordInputRef = useRef();
   const { login } = useContext(AuthContext);
+  const history = useHistory();
 
   const switchAuthModeHandler = () => {
     setIsLogin((prevState) => !prevState);
   };
   const submitHandler = async (event) => {
     event.preventDefault();
+
     const enteredEmail = emailInputRef.current.value;
     const enteredPassword = passwordInputRef.current.value;
 
     setIsLoading(true);
 
-    const API_KEY = "AIzaSyCfslm8Fa0m8vEwpmRcAhUVpN6_XqF5DDQ";
+    const API_KEY = process.env.REACT_APP_API_KEY;
     const url = isLogin
       ? `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${API_KEY}`
       : `https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${API_KEY}`;
@@ -40,7 +43,6 @@ const AuthForm = () => {
 
       const data = await res.json();
 
-      console.log(data);
       if (!res.ok) {
         let errorMessage = "Authentication failed!";
         if (data && data.error && data.error.message)
@@ -49,8 +51,8 @@ const AuthForm = () => {
         throw new Error(errorMessage);
       }
 
-      console.log(data);
       login(data.idToken);
+      history.replace("/");
     } catch (err) {
       alert(err);
     } finally {
