@@ -1,4 +1,10 @@
-import { Switch, Route, Redirect } from "react-router-dom";
+import {
+  Route,
+  Navigate,
+  createBrowserRouter,
+  createRoutesFromElements,
+  RouterProvider,
+} from "react-router-dom";
 
 import Layout from "./components/Layout/Layout";
 import UserProfile from "./components/Profile/UserProfile";
@@ -7,28 +13,25 @@ import HomePage from "./pages/HomePage";
 import { useContext } from "react";
 import AuthContext from "./store/auth-context";
 
+const router = (isLoggedIn) =>
+  createBrowserRouter(
+    createRoutesFromElements(
+      <Route element={<Layout />}>
+        <Route path="/" element={<HomePage />} />
+        {!isLoggedIn && <Route path="/auth" element={<AuthPage />} />}
+        <Route
+          path="/profile"
+          element={isLoggedIn ? <UserProfile /> : <Navigate to="/auth" />}
+        />
+        <Route path="*" element={<Navigate to="/" />} />
+      </Route>
+    )
+  );
+
 function App() {
   const { isLoggedIn } = useContext(AuthContext);
-  return (
-    <Layout>
-      <Switch>
-        <Route path="/" exact>
-          <HomePage />
-        </Route>
-        {!isLoggedIn && (
-          <Route path="/auth">
-            <AuthPage />
-          </Route>
-        )}
-        <Route path="/profile">
-          {isLoggedIn ? <UserProfile /> : <Redirect to="/auth" />}
-        </Route>
-        <Route path="*">
-          <Redirect to="/" />
-        </Route>
-      </Switch>
-    </Layout>
-  );
+
+  return <RouterProvider router={router(isLoggedIn)} />;
 }
 
 export default App;

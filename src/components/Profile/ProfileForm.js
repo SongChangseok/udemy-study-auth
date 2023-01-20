@@ -1,13 +1,13 @@
 import { useContext, useRef, useState } from "react";
 import classes from "./ProfileForm.module.css";
 import AuthContext from "../../store/auth-context";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const ProfileForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const authCtx = useContext(AuthContext);
   const newPasswordInputRef = useRef();
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const submitHandler = async (e) => {
     e.preventDefault();
@@ -42,7 +42,7 @@ const ProfileForm = () => {
         throw new Error(errorMessage);
       }
 
-      history.replace("/");
+      navigate.replace("/");
     } catch (err) {
       alert(err);
     } finally {
